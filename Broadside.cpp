@@ -20,7 +20,8 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "shader.hpp"
+#include <oogl/GLSLShader.h>
+#include <oogl/GLSLProgram.h>
 #include "cube.h"
 #include "hexagon.h"
 #include "BufferedCube.h"
@@ -98,7 +99,21 @@ int LinMain(int argc, char** argv) {
 	  
 	initialise();
 	
-	programID = LoadShaders( "TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader" );
+	//create program
+	programID = glCreateProgram();
+
+	//compile shaders
+	GLuint vertexshader = oogl::loadShader("shader/TransformVertexShader.vertexshader",GL_VERTEX_SHADER);
+	GLuint fragmentshader = oogl::loadShader("shader/ColorFragmentShader.fragmentshader",GL_FRAGMENT_SHADER);
+
+	//attach shaders
+	glAttachShader(programID, vertexshader);
+	glAttachShader(programID, fragmentshader);
+
+	//link program
+	GLint status;
+	glLinkProgram(programID);
+	
 	MatrixID = glGetUniformLocation(programID, "MVP");
 	vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
 	vertexColorID = glGetAttribLocation(programID, "vertexColor");

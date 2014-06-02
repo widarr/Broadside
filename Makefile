@@ -6,7 +6,7 @@ CXXFLAGS=$(CFLAGS)
 LINCXXFLAGS=$(CXXFLAGS) -D__LINUX__
 APPNAME=gfxtest
 BUILDNAME=$(APPNAME)
-SRCS=gfxtest.cpp shader.cpp
+SRCS=gfxtest.cpp
 OBJDIR=.
 
 all: $(SRCS) $(APPNAME)
