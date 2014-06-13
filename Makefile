@@ -1,21 +1,23 @@
 #!/bin/make
 CC=g++
-LDFLAGS=-lGL -lGLU -lglfw -lGLEW
+LDFLAGS=-lGL -lGLU -lglfw -lboost_system -lboost_filesystem -lcgutils
 CFLAGS=-g -O3 -pipe -Wall -fomit-frame-pointer
 CXXFLAGS=$(CFLAGS)
-LINCXXFLAGS=$(CXXFLAGS) -D__LINUX__
-APPNAME=gfxtest
+APPNAME=Broadside
 BUILDNAME=$(APPNAME)
-SRCS=gfxtest.cpp
+SRCS=Broadside.cpp
 OBJDIR=.
+LIBCGUTILSDIR=libcgutils/build/
+OBJ3DINCLUDE=libcgutils/Obj3D/
+CGUTILSINCLUDE=libcgutils/
 
 all: $(SRCS) $(APPNAME)
 
 objects: clean
-	$(CC) $(LINCXXFLAGS) -c $(SRCS)
+	$(CC) $(CXXFLAGS) -I${CGUTILSINCLUDE} -I${OBJ3DINCLUDE} -c $(SRCS)
 
 $(APPNAME): objects
-	$(CC) $(LDFLAGS) -o $(BUILDNAME) $(OBJDIR)/*.o
+	$(CC) $(LDFLAGS) -L${LIBCGUTILSDIR} -o $(BUILDNAME) $(OBJDIR)/*.o
 
 run: $(SRCS) $(APPNAME)
 	./$(BUILDNAME) &
@@ -23,4 +25,3 @@ run: $(SRCS) $(APPNAME)
 clean:
 	rm -vf $(BUILDNAME)
 	rm -vf $(OBJDIR)/*.o
-	rm -vf $(OBJDIR)/*_win.o

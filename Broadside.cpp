@@ -9,23 +9,7 @@
  * Dieser Text sollte später ersetzt/umgeschrieben werden und der test ordner
  * kann dann auch entfernt werden
  */
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <cstring>
-#include <unistd.h>
-#include <cmath>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <oogl/GLSLShader.h>
-#include <oogl/GLSLProgram.h>
-#include "cube.h"
-#include "hexagon.h"
-#include "BufferedCube.h"
-#include "Obj3D/Renderable.h"
+#include "Broadside.hpp"
 
 #ifndef __cplusplus
 #define __cplusplus
@@ -34,12 +18,6 @@
 GLFWwindow* window;
 int gwidth = 640;
 int gheight = 480;
-#define GLCOLOR1 0.91f, 0.128f, 0.64f, 1.0f
-#define GLCOLOR2 0.0f, 1.0f, 0.0f, 0.5f
-#define GLCOLOR3 0.0f, 0.0f, 1.0f, 0.5f
-
-#define RGB2F(r,g,b) 1.0/255*r,1.0/255*g,1.0/255*b
-#define F2RGB(r,g,b) 255*r,255*g,255*b
 
 // Initial position vectors
 glm::vec3 position = glm::vec3( 0.0, 5.0, 10.0 );
@@ -56,25 +34,12 @@ float depthAngle = 0.0f;
 float FoV = 45.0f;
 bool ortho = false;
 
-// Forward declaration of our MVP matrix, GLSL variables and buffers
-glm::mat4 MVP = glm::mat4();
-GLuint vertexbuffer = 0;
-GLuint colorbuffer = 0;
-GLuint programID = 0;
-GLuint MatrixID = 0;
-GLuint vertexPosition_modelspaceID = 0;
-GLuint vertexColorID = 0;
-
 float speed = 0.05f; // 3 units / second
 float mouseSpeed = 0.005f;
 bool pointerLocked = false;
 double xpos = 0.0f;
 double ypos = 0.0f;
 float deltaTime = 0.0f;
-
-static GLfloat yRot = 0.0f;
-static GLfloat xRot = 0.0f;
-static GLfloat zRot = 0.0f;
 
 void initialise();
 void Rendering();
@@ -99,33 +64,6 @@ int LinMain(int argc, char** argv) {
 	  
 	initialise();
 	
-	//create program
-	programID = glCreateProgram();
-
-	//compile shaders
-	GLuint vertexshader = oogl::loadShader("shader/TransformVertexShader.vertexshader",GL_VERTEX_SHADER);
-	GLuint fragmentshader = oogl::loadShader("shader/ColorFragmentShader.fragmentshader",GL_FRAGMENT_SHADER);
-
-	//attach shaders
-	glAttachShader(programID, vertexshader);
-	glAttachShader(programID, fragmentshader);
-
-	//link program
-	GLint status;
-	glLinkProgram(programID);
-	
-	MatrixID = glGetUniformLocation(programID, "MVP");
-	vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
-	vertexColorID = glGetAttribLocation(programID, "vertexColor");
-	
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-	
 	do {
 		  Rendering();
 	} while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -143,36 +81,8 @@ void Rendering() {
 	glCullFace(GL_BACK);
 	glPolygonMode(GL_BACK,GL_FILL);
 	glLoadIdentity();
-		
 	runPipeline();
 	
-	glTranslatef(0.0f, 1.0f, 0.0f);
-	drawBufferedCube();
-	
-	glLoadIdentity();
-	glPushMatrix();
-		// Ground
-		glBegin(GL_QUADS);
-			glColor4f(0.5f,0.5f,0.5f,1.0f);
-			glVertex3f(-50,0,50);
-			glVertex3f(50,0,50);
-			glVertex3f(50,0,-50);
-			glVertex3f(-50,0,-50);
-		glEnd();
-	glPopMatrix();
-
-	/*
-	for(int i = -3; i < 3; i++)
-		for(int j=-3; j < 3; j++) {
-			glPushMatrix();
-			glTranslatef(i*15.0,3,j * 15.0);
-			glScalef(3.0f, 3.0f, 3.0f);
-			glRotatef(yRot,0.0,1.0,0.0); // Rotate on y
-			drawHexagon();
-			glPopMatrix();
-		}
-	
-	 */
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
@@ -183,20 +93,18 @@ void runPipeline(){
 	Mortimer();
 	move();
 	
-	glm::mat4 ProjectionMatrix;
-	
+	Matrices m;
+		
 	if(ortho) {
-		ProjectionMatrix = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f);
+		m.P = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f);
 	} else {
-		ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.01f, 300.0f);
+		m.P = glm::perspective(FoV, 4.0f / 3.0f, 0.01f, 300.0f);
 	}
-	glm::mat4 ViewMatrix = glm::lookAt(position,position+direction, up);
-	glm::mat4 ModelMatrix = glm::mat4(1.0);
-	MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-
-	// Send our transformation to the currently bound shader, 
-	// in the "MVP" uniform
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	m.V = glm::lookAt(position,position+direction, up);
+	m.M = Pipeline.getIdentityMatrix();
+	m.MVP = m.P * m.V * m.M;
+	
+	Pipeline.setPipeline(m);
 }
 
 void Mortimer() {
@@ -207,17 +115,7 @@ void Mortimer() {
 	deltaTime = tick;
 	
 	if(tick > 33) {
-		xRot += 2;
-		yRot += 4;
-		zRot += 6;
-		
-		if(yRot == 359)
-			yRot = 0;
-		if(xRot == 359)
-			xRot = 0;
-		if(zRot == 359)
-			zRot = 0;
-		tick = 0.0f;
+		// put animation timer variable here
 	}
 }
 
@@ -306,12 +204,6 @@ void initialise() {
 	}
 	glfwMakeContextCurrent(window);
 	
-	// Initialize GLEW
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW\n");
-		exit(-1);
-	}
-	
 	printf("OpenGL Version %s initialised\n", glGetString(GL_VERSION));
 	GLfloat m, p;
 	glGetFloatv(GL_MAX_MODELVIEW_STACK_DEPTH, &m);
@@ -331,44 +223,4 @@ void initialise() {
 	glDepthFunc(GL_LESS); 
 	// Cull triangles which normal is not towards the camera
 	glEnable(GL_CULL_FACE);
-}
-
-void drawBufferedCube()
-{
-	// Use our shader
-	glUseProgram(programID);
-	
-	// Send our transformation to the currently bound shader, 
-	// in the "MVP" uniform
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-	
-	// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray(vertexPosition_modelspaceID);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(
-		vertexPosition_modelspaceID, // The attribute we want to configure
-		3,                           // size
-		GL_FLOAT,                    // type
-		GL_FALSE,                    // normalized?
-		0,                           // stride
-		(void*)0                     // array buffer offset
-	);
-
-	// 2nd attribute buffer : colors
-	glEnableVertexAttribArray(vertexColorID);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glVertexAttribPointer(
-		vertexColorID,               // The attribute we want to configure
-		3,                           // size
-		GL_FLOAT,                    // type
-		GL_FALSE,                    // normalized?
-		0,                           // stride
-		(void*)0                     // array buffer offset
-	);
-	
-	// Draw the triangleS !
-	glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles
-
-	glDisableVertexAttribArray(vertexPosition_modelspaceID);
-	glDisableVertexAttribArray(vertexColorID);
 }
