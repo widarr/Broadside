@@ -1,3 +1,6 @@
+
+#include "libcgutils/Obj3D/Obj3D.h"
+
 /*
  * Hier entsteht das Spieleprojekt für das Fach Computer Graphics
  * Der Main Loop des Programmes befindet sich hier.
@@ -41,6 +44,8 @@ double xpos = 0.0f;
 double ypos = 0.0f;
 float deltaTime = 0.0f;
 
+Obj3D* testmodel = NULL;
+
 void initialise();
 void Rendering();
 void runPipeline();
@@ -64,6 +69,10 @@ int LinMain(int argc, char** argv) {
 	  
 	initialise();
 	
+	testmodel = new Obj3D();
+	testmodel->initialise("cube");
+	testmodel->spawnAt(0,0,0);
+	
 	do {
 		  Rendering();
 	} while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -83,6 +92,7 @@ void Rendering() {
 	glLoadIdentity();
 	runPipeline();
 	
+	testmodel->draw();
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
