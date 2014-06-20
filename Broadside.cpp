@@ -44,7 +44,15 @@ double xpos = 0.0f;
 double ypos = 0.0f;
 float deltaTime = 0.0f;
 
-Obj3D* testmodel = NULL;
+Obj3D* testmodel1 = NULL;
+Obj3D* testmodel2 = NULL;
+Obj3D* testmodel3 = NULL;
+Obj3D* testmodel4 = NULL;
+Obj3D* testmodel5 = NULL;
+Obj3D* testmodel6 = NULL;
+Obj3D* testmodel7 = NULL;
+Obj3D* testmodel8 = NULL;
+Obj3D* sphere = NULL;
 
 void initialise();
 void Rendering();
@@ -69,9 +77,41 @@ int LinMain(int argc, char** argv) {
 	  
 	initialise();
 	
-	testmodel = new Obj3D();
-	testmodel->initialise("cube");
-	testmodel->spawnAt(0,0,0);
+	testmodel1 = new Obj3D();
+	testmodel1->initialise("cube");
+	testmodel1->spawnAt(-10,10,-10);
+	
+	testmodel2 = new Obj3D();
+	testmodel2->initialise("cube");
+	testmodel2->spawnAt(10,10,-10);
+	
+	testmodel3 = new Obj3D();
+	testmodel3->initialise("cube");
+	testmodel3->spawnAt(10,10,10);
+	
+	testmodel4 = new Obj3D();
+	testmodel4->initialise("cube");
+	testmodel4->spawnAt(-10,10,10);
+	
+	testmodel5 = new Obj3D();
+	testmodel5->initialise("cube");
+	testmodel5->spawnAt(-10,-10,-10);
+	
+	testmodel6 = new Obj3D();
+	testmodel6->initialise("cube");
+	testmodel6->spawnAt(10,-10,-10);
+	
+	testmodel7 = new Obj3D();
+	testmodel7->initialise("cube");
+	testmodel7->spawnAt(10,-10,10);
+	
+	testmodel8 = new Obj3D();
+	testmodel8->initialise("cube");
+	testmodel8->spawnAt(-10,-10,10);
+	
+	sphere = new Obj3D();
+	sphere->initialise("sphere");
+	sphere->spawnAt(0,0,0);
 	
 	do {
 		  Rendering();
@@ -92,7 +132,15 @@ void Rendering() {
 	glLoadIdentity();
 	runPipeline();
 	
-	testmodel->draw();
+	testmodel1->draw();
+	testmodel2->draw();
+	testmodel3->draw();
+	testmodel4->draw();
+	testmodel5->draw();
+	testmodel6->draw();
+	testmodel7->draw();
+	testmodel8->draw();
+	//sphere->draw();
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
