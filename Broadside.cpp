@@ -23,14 +23,14 @@ int gwidth = 640;
 int gheight = 480;
 
 // Initial position vectors
-glm::vec3 position = glm::vec3( 0.0, 5.0, 10.0 );
+glm::vec3 position = glm::vec3( 0.0, 0.0, 40.0 );
 glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 right = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 // Initial horizontal angle : toward -Z
-float horizontalAngle = 3.14f;
+float horizontalAngle = Helpers::deg2rad(356.5f);
 // Initial vertical angle : none
-float verticalAngle = 0.0f;
+float verticalAngle = Helpers::deg2rad(222.5f);
 // Initial z-Axis angle
 float depthAngle = 0.0f;
 // Initial Field of View
@@ -212,6 +212,18 @@ void keyboard() {
 		position -= up * deltaTime * speed;
 	}
 	
+	/* We don't need this LSD effect for now ;)
+	if (glfwGetKey( window, GLFW_KEY_E ) == GLFW_PRESS){
+		FoV += 5.0f;
+		if(FoV >= 360.0f)
+		  FoV = 45.0f;
+	}
+	if (glfwGetKey( window, GLFW_KEY_Q ) == GLFW_PRESS){
+		FoV -= 5.0f;
+		if(FoV <= 0.0f)
+		  FoV = 45;
+	}
+	*/
 }
 
 void move() {
