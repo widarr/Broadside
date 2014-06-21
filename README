@@ -1,0 +1,20 @@
+
+Some words about the OBJ loader from the OpenGL Tutorial:
+
+This one is a real asshole. Like the original author mentioned it can't do shit!
+Do REALLY search for a better one!
+
+Some things to consider about exporting .obj files if we use this loader:
+
+* Create fucking UV coordinates or it won't work, in Blender:
+ - When you have a model: switch to Edit Mode
+ - Mesh -> UV Unwrap -> Unwrap
+
+* Exporting Options:
+
+ File -> Export -> Wavefront (.obj)
+
+ - Selection only
+ - Write Normals
+ - Include UVs (don't fuck with this one)
+ - Triangulate Faces (if you don't use this, Blender will export Quads and your model will look like swiss cheese)
