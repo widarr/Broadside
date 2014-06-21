@@ -53,6 +53,7 @@ Obj3D* testmodel6 = NULL;
 Obj3D* testmodel7 = NULL;
 Obj3D* testmodel8 = NULL;
 Obj3D* sphere = NULL;
+Obj3D* suzanne = NULL;
 
 void initialise();
 void Rendering();
@@ -113,6 +114,10 @@ int LinMain(int argc, char** argv) {
 	sphere->initialise("sphere");
 	sphere->spawnAt(0,0,0);
 	
+	suzanne = new Obj3D();
+	suzanne->initialise("suzanne");
+	suzanne->spawnAt(0,10,0);
+	
 	do {
 		  Rendering();
 	} while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -140,7 +145,8 @@ void Rendering() {
 	testmodel6->draw();
 	testmodel7->draw();
 	testmodel8->draw();
-	//sphere->draw();
+	sphere->draw();
+	suzanne->draw();
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
