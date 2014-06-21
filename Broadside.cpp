@@ -81,7 +81,7 @@ int LinMain(int argc, char** argv) {
 	testmodel1 = new Obj3D();
 	testmodel1->initialise("cube");
 	testmodel1->spawnAt(-10,10,-10);
-	
+
 	testmodel2 = new Obj3D();
 	testmodel2->initialise("cube");
 	testmodel2->spawnAt(10,10,-10);
@@ -117,7 +117,7 @@ int LinMain(int argc, char** argv) {
 	suzanne = new Obj3D();
 	suzanne->initialise("suzanne");
 	suzanne->spawnAt(0,10,0);
-	
+
 	do {
 		  Rendering();
 	} while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -147,6 +147,7 @@ void Rendering() {
 	testmodel8->draw();
 	sphere->draw();
 	suzanne->draw();
+
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
