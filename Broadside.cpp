@@ -54,6 +54,7 @@ Obj3D* testmodel7 = NULL;
 Obj3D* testmodel8 = NULL;
 Obj3D* sphere = NULL;
 Obj3D* suzanne = NULL;
+Obj3D* floor_obj = NULL;
 
 void initialise();
 void Rendering();
@@ -117,6 +118,10 @@ int LinMain(int argc, char** argv) {
 	suzanne = new Obj3D();
 	suzanne->initialise("suzanne");
 	suzanne->spawnAt(0,10,0);
+	
+	floor_obj = new Obj3D();
+	floor_obj->initialise("floor");
+	floor_obj->spawnAt(0,-15,0);
 
 	do {
 		  Rendering();
@@ -147,6 +152,7 @@ void Rendering() {
 	testmodel8->draw();
 	sphere->draw();
 	suzanne->draw();
+	floor_obj->draw();
 
 	
 	glfwSwapBuffers(window);
