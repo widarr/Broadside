@@ -37,7 +37,7 @@ float depthAngle = 0.0f;
 float FoV = 45.0f;
 bool ortho = false;
 
-float speed = 0.05f; // 3 units / second
+float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 bool pointerLocked = false;
 double xpos = 0.0f;
@@ -157,11 +157,10 @@ void Rendering() {
 	
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+	Mortimer();
 }
 
 void runPipeline(){
-	
-	Mortimer();
 	move();
 	
 	Matrices m;
@@ -178,12 +177,12 @@ void runPipeline(){
 	Pipeline.setPipeline(m);
 }
 
-void Mortimer() {
-	  
+void Mortimer() { 
 	static double lastTick = glfwGetTime();
 	double currentTick = glfwGetTime();
 	double tick = float(currentTick - lastTick);
 	deltaTime = tick;
+	lastTick = glfwGetTime();
 	
 	if(tick > 33) {
 		// put animation timer variable here
@@ -218,8 +217,13 @@ void keyboard() {
 	if (glfwGetKey( window, GLFW_KEY_C ) == GLFW_PRESS){
 		position -= up * deltaTime * speed;
 	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+	  speed = 15.0f;
+	} else {
+	  speed = 3.0f;
+	}
 	
-	/* We don't need this LSD effect for now ;)
+	// We don't need this LSD effect for now ;)
 	if (glfwGetKey( window, GLFW_KEY_E ) == GLFW_PRESS){
 		FoV += 5.0f;
 		if(FoV >= 360.0f)
@@ -230,20 +234,19 @@ void keyboard() {
 		if(FoV <= 0.0f)
 		  FoV = 45;
 	}
-	*/
+	//*/
 }
 
 void move() {
-	static double lastTime = glfwGetTime();
-	double currentTime = glfwGetTime();
-	deltaTime = float(currentTime - lastTime);
+	int width, height = 0;
 	glfwGetCursorPos(window, &xpos, &ypos);
+	glfwGetWindowSize (window, &width, &height);
 	
-	glfwSetCursorPos(window, gwidth/2, gheight/2);
+	glfwSetCursorPos(window, width/2, height/2);
 	
 	// Compute new orientation
-	horizontalAngle += mouseSpeed * float( gwidth/2 - xpos );
-	verticalAngle   += mouseSpeed * float( gheight/2 - ypos );
+	horizontalAngle += mouseSpeed * float( width/2 - xpos );
+	verticalAngle   += mouseSpeed * float( height/2 - ypos );
 	  
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
 	direction = glm::vec3(
